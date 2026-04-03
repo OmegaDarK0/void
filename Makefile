@@ -25,7 +25,7 @@ endif
 CFLAGS    := $(ARCH_FLAGS) -std=c17 -Wall -Wextra -I$(INC_DIR) -DVERSION=\"$(VERSION)\" -D_REENTRANT
 CXXFLAGS  := $(ARCH_FLAGS) -std=c++20 -Wall -Wextra -I$(INC_DIR) -DVERSION=\"$(VERSION)\" -D_REENTRANT
 
-LDFLAGS   := $(ARCH_FLAGS) -Wl,-z,relro,-z,now -L$(LIB_DIR) -Wl,-rpath='$$ORIGIN/../../$(LIB_DIR)' -Wl,--enable-new-dtags
+LDFLAGS   := $(ARCH_FLAGS) -L$(LIB_DIR) -Wl,-rpath='$$ORIGIN/../../$(LIB_DIR)' -Wl,--enable-new-dtags
 LDLIBS    := -pthread -lm -ldl -lSDL2
 
 DEPFLAGS   = -MT $@ -MMD -MP -MF $(DEP_DIR)/$*.d
@@ -37,7 +37,7 @@ ifeq ($(BUILD),debug)
 else
     CFLAGS   += -O2 -fstack-protector-strong -DNDEBUG
     CXXFLAGS += -O2 -fstack-protector-strong -DNDEBUG
-    LDFLAGS  += -s
+    LDFLAGS  += -s -Wl,-z,relro,-z,now
 endif
 
 SRCS_C    := $(shell find $(SRC_DIR) -type f -name "*.c")
