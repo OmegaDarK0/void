@@ -1,8 +1,13 @@
 #ifndef VOID_H
 #define VOID_H
 
-#include <stdint.h>
-#include <stdbool.h>
+#include <SDL2/SDL.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+#define KB 1024
+#define MB (1024 * KB)
+#define GB (1024 * MB)
 
 #ifdef __cplusplus
 extern "C" {
@@ -12,13 +17,31 @@ extern "C" {
 // TYPES FONDAMENTAUX
 // ============================================================================
 // Garantie de la taille des données, vital pour le Data-Oriented Design (SoA)
-typedef uint8_t  u8;
-typedef uint16_t u16;
-typedef uint32_t u32;
-typedef uint64_t u64;
-typedef int32_t  i32;
-typedef float    f32;
-typedef double   f64;
+typedef enum {
+    VOID_OK,
+    VOID_ERROR,
+    VOID_WARNING,
+    VOID_INFO
+} VoidStatus;
+
+typedef unsigned char       uchar;
+typedef unsigned short int  ushort;
+typedef unsigned int        uint;
+typedef unsigned long int   ulong;
+
+typedef unsigned char       uint8;
+typedef unsigned short int  uint16;
+typedef unsigned int        uint32;
+typedef unsigned long int   uint64;
+
+typedef signed char         int8;
+typedef signed short int    int16;
+typedef signed int          int32;
+typedef signed long int     int64;
+
+typedef float               float32;
+typedef double              float64;
+typedef long double         float80;
 
 // ============================================================================
 // SYSTÈME & TEMPS (system.c / time.c)
@@ -26,41 +49,43 @@ typedef double   f64;
 void void_system_init(void);
 void void_system_shutdown(void);
 
-u32  void_system_get_core_count(void); // Utile pour initialiser les workers (job.cpp)
+uint32 void_system_get_core_count(void); // Utile pour initialiser les workers (job.cpp)
 
-u64  void_time_get_ticks(void);        // Temps haute résolution
-f32  void_time_get_delta(void);        // Delta time calculé par le Back-end
+uint64 void_time_get_ticks(void);        // Temps haute résolution
+float32 void_time_get_delta(void);        // Delta time calculé par le Back-end
 
 // ============================================================================
 // MÉMOIRE (memory.c)
 // ============================================================================
 // Le Back-end alloue de gros blocs au démarrage via l'OS.
-// L'Éther (C++) demandera des sous-blocs à partir de ces arènes.
+// Le Front-end (C++) demandera des sous-blocs à partir de ces arènes.
 
-bool void_memory_init_global_arena(u64 size_in_bytes);
-void void_memory_shutdown(void);
+void void_memory_print(void);
+
+uint8 void_memory_init_arena(uint64 size);
+void void_memory_quit(void);
 
 // Allocation depuis l'arène globale (persistante)
-void* void_arena_alloc(u64 size, u32 alignment);
+void* void_arena_alloc(uint64 size, uint32 alignment);
 
-// Arène temporaire (réinitialisée à chaque frame par l'Éther)
-void* void_frame_alloc(u64 size, u32 alignment);
-void  void_frame_clear(void);
+// Arène temporaire (réinitialisée à chaque frame par le Front-end)
+void* void_frame_alloc(uint64 size, uint32 alignment);
+void void_frame_free(void);
 
 // ============================================================================
 // FENÊTRE & ENTRÉES (window.c / input.c)
 // ============================================================================
-// Pointeur opaque : l'Éther n'a pas besoin de savoir ce qu'est une fenêtre SDL
-typedef struct VoidWindow VoidWindow; 
+// Pointeur opaque : le Front-end n'a pas besoin de savoir ce qu'est une fenêtre SDL
+typedef SDL_Window VoidWindow;
 
-VoidWindow* void_window_create(const char* title, u32 width, u32 height);
-void        void_window_destroy(VoidWindow* window);
-bool        void_window_should_close(VoidWindow* window);
-void        void_window_poll_events(void); // Récupère les messages de l'OS
+VoidWindow* void_window_create(const char* title, uint32 width, uint32 height);
+void void_window_destroy(VoidWindow* window);
+uint8 void_window_should_close(VoidWindow* window);
+void void_window_poll_events(void); // Récupère les messages de l'OS
 
 // Lecture de l'état du clavier sans callback/event listener
-bool void_input_is_key_pressed(u32 keycode);
-bool void_input_is_mouse_button_pressed(u8 button);
+uint8 void_input_is_key_pressed(uint32 keycode);
+uint8 void_input_is_mouse_button_pressed(uint8 button);
 
 // ============================================================================
 // THREADING BAS NIVEAU (thread.c)
@@ -69,12 +94,12 @@ bool void_input_is_mouse_button_pressed(u8 button);
 typedef void (*VoidThreadFunc)(void* data);
 
 void void_thread_create(VoidThreadFunc func, void* data);
-void void_thread_sleep(u32 milliseconds);
+void void_thread_sleep(uint32 milliseconds);
 
 // Primitives atomiques pour éviter les mutex bloquants
-u32  void_atomic_increment(volatile u32* value);
-u32  void_atomic_decrement(volatile u32* value);
-bool void_atomic_compare_exchange(volatile u32* value, u32 expected, u32 new_value);
+uint32 void_atomic_increment(volatile uint32* value);
+uint32 void_atomic_decrement(volatile uint32* value);
+uint8 void_atomic_compare_exchange(volatile uint32* value, uint32 expected, uint32 new_value);
 
 #ifdef __cplusplus
 }
