@@ -35,14 +35,12 @@ typedef unsigned short int  uint16;
 typedef unsigned int        uint32;
 typedef unsigned long int   uint64;
 
+// ============================================================================
+// SYSTÈME & TEMPS (core.c / time.c)
+// ============================================================================
+
 uint8 void_engine_init(void);
 void void_engine_quit(void);
-
-// ============================================================================
-// SYSTÈME & TEMPS (system.c / time.c)
-// ============================================================================
-void void_system_init(void);
-void void_system_shutdown(void);
 
 uint32 void_system_get_core_count(void); // Utile pour initialiser les workers (job.cpp)
 
@@ -77,8 +75,10 @@ typedef struct VoidWindow VoidWindow;
 
 VoidWindow *void_window_create(const char *title, uint32 width, uint32 height);
 void void_window_destroy(const VoidWindow *window);
+void void_window_close(VoidWindow *window);
+bool void_window_is_running(const VoidWindow *window);
 bool void_window_should_close(const VoidWindow *window);
-void void_window_poll_events(void); // Récupère les messages de l'OS
+void void_window_poll_events(VoidWindow *window); // Récupère les messages de l'OS
 
 // Lecture de l'état du clavier sans callback/event listener
 uint8 void_input_is_key_pressed(uint32 keycode);
@@ -88,13 +88,13 @@ uint8 void_input_is_mouse_button_pressed(uint8 button);
 // RENDU 2D BASIQUE (Fourni par le back-end SDL_Renderer)
 // ============================================================================
 // Efface l'écran avec une couleur (R, G, B, A)
-void void_render_clear(VoidWindow *window, uint8 r, uint8 g, uint8 b, uint8 a);
-
-// Dessine un rectangle plein
-void void_render_rect(VoidWindow *window, int x, int y, int w, int h, uint8 r, uint8 g, uint8 b, uint8 a);
+uint8 void_render_clear(const VoidWindow *window, uint8 r, uint8 g, uint8 b, uint8 a);
 
 // Envoie l'image finale à l'écran (Swap Buffers)
-void void_render_present(VoidWindow *window);
+void void_render_present(const VoidWindow *window);
+
+// Dessine un rectangle plein
+uint8 void_render_rect(const VoidWindow *window, int x, int y, int w, int h, uint8 r, uint8 g, uint8 b, uint8 a, bool fill);
 
 // ============================================================================
 // THREADING BAS NIVEAU (thread.c)

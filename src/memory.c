@@ -34,14 +34,6 @@ uint8 void_memory_init_arena(const uint64 size) {
     s_frame_arena.base = s_global_arena.base + s_global_arena.capacity;
     s_global_arena.offset = 0;
     s_frame_arena.offset = 0;
-    /*printf("Initialized global arena :\n");
-    printf("-global arena base: %p\n", s_global_arena.base);
-    printf("-global arena capacity: %lu\n", s_global_arena.capacity);
-    printf("-global arena offset: %lu\n", s_global_arena.offset);
-    printf("-frame arena base: %p\n", s_frame_arena.base);
-    printf("-frame arena capacity: %lu\n", s_frame_arena.capacity);
-    printf("-frame arena offset: %lu\n", s_frame_arena.offset);
-    printf("----------------------------------------\n");*/
     return VOID_SUCCESS;
 }
 
@@ -58,12 +50,6 @@ void *void_arena_alloc(const uint64 size, const uint32 alignment) {
     if (s_global_arena.offset + padding + size > s_global_arena.capacity) return NULL;
     s_global_arena.offset_prev = s_global_arena.offset;
     s_global_arena.offset += padding + size;
-    /*printf("Arena allocated :\n");
-    printf("-current address : %lu\n", address);
-    printf("-aligned address : %lu\n", aligned_address);
-    printf("-address padding : %lu\n", padding);
-    printf("-address offset : %lu\n", s_global_arena.offset);
-    printf("----------------------------------------\n");*/
     return (void*)aligned_address;
 }
 
@@ -78,12 +64,6 @@ void *void_frame_alloc(const uint64 size, const uint32 alignment) {
     if (s_frame_arena.offset + padding + size > s_frame_arena.capacity) return NULL;
     s_frame_arena.offset_prev = s_frame_arena.offset;
     s_frame_arena.offset += padding + size;
-    /*printf("Frame allocated :\n");
-    printf("-current address : %lu\n", address);
-    printf("-aligned address : %lu\n", aligned_address);
-    printf("-address padding : %lu\n", padding);
-    printf("-address offset : %lu\n", s_frame_arena.offset);
-    printf("----------------------------------------\n");*/
     return (void*)aligned_address;
 }
 
