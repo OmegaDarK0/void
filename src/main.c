@@ -28,6 +28,7 @@ int main(void) {
     void_memory_print();
     const int size = 200;
     int posx = WIDTH / 2 - size / 2, posy = HEIGHT / 2 - size / 2;
+    int r = 0, g = 0, b = 0;
     while (void_window_is_running(window)) {
         void_window_poll_events(window);
         if (void_window_should_close(window)) {
@@ -42,26 +43,23 @@ int main(void) {
         const uint64 s = ms / 1000;
         switch (s % 3) {
             case 0:
-                void_render_rect(window,
-                    posx, posy, size, size,
-                    255, 0, 0, 255,
-                    1);
+                r = 255;
+                g = b = 0;
                 break;
             case 1:
-                void_render_rect(window,
-                    posx, posy, size, size,
-                    0, 255, 0, 255,
-                    1);
+                g = 255;
+                r = b = 0;
                 break;
             case 2:
-                void_render_rect(window,
-                    posx, posy, size, size,
-                    0, 0, 255, 255,
-                    1);
+                b = 255;
+                r = g = 0;
                 break;
             default:
                 break;
         }
+        void_render_rect(window,
+            (float)posx, (float)posy, (float)size, (float)size,
+            r, g, b, 255, 1);
         void_render_present(window);
         void_frame_free();
     }

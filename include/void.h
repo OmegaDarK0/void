@@ -94,7 +94,7 @@ uint8 void_render_clear(const VoidWindow *window, uint8 r, uint8 g, uint8 b, uin
 void void_render_present(const VoidWindow *window);
 
 // Dessine un rectangle plein
-uint8 void_render_rect(const VoidWindow *window, int x, int y, int w, int h, uint8 r, uint8 g, uint8 b, uint8 a, bool fill);
+uint8 void_render_rect(const VoidWindow *window, float x, float y, float w, float h, uint8 r, uint8 g, uint8 b, uint8 a, bool fill);
 
 // ============================================================================
 // THREADING BAS NIVEAU (thread.c)

@@ -112,17 +112,17 @@ void void_render_present(const VoidWindow *window) {
     SDL_RenderPresent(window->render);
 }
 
-uint8 void_render_rect(const VoidWindow *window, const int x, const int y, const int w, const int h, const uint8 r, const uint8 g, const uint8 b, const uint8 a, bool fill) {
+uint8 void_render_rect(const VoidWindow *window, const float x, const float y, const float w, const float h, const uint8 r, const uint8 g, const uint8 b, const uint8 a, bool fill) {
     if (SDL_SetRenderDrawColor(window->render, r, g, b, a) < 0) {
         return VOID_FAILURE;
     }
-    const SDL_Rect rect = {x, y, w, h};
+    const SDL_FRect rect = {x, y, w, h};
     if (fill) {
-        if (SDL_RenderFillRect(window->render, &rect) < 0) {
+        if (SDL_RenderFillRectF(window->render, &rect) < 0) {
             return VOID_FAILURE;
         }
     } else {
-        if (SDL_RenderDrawRect(window->render, &rect) < 0) {
+        if (SDL_RenderDrawRectF(window->render, &rect) < 0) {
             return VOID_FAILURE;
         }
     }
