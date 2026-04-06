@@ -22,18 +22,18 @@ else
     ARCH_FLAGS := -m64
 endif
 
-CFLAGS    := $(ARCH_FLAGS) -std=c17 -Wall -Wextra -I$(INC_DIR) -DVERSION=\"$(VERSION)\" -D_REENTRANT
-CXXFLAGS  := $(ARCH_FLAGS) -std=c++20 -Wall -Wextra -I$(INC_DIR) -DVERSION=\"$(VERSION)\" -D_REENTRANT
+CFLAGS    := $(ARCH_FLAGS) -std=c17 -Wall -Wextra -I$(INC_DIR) -DVERSION=\"$(VERSION)\"
+CXXFLAGS  := $(ARCH_FLAGS) -std=c++20 -Wall -Wextra -I$(INC_DIR) -DVERSION=\"$(VERSION)\"
 
-LDFLAGS   := $(ARCH_FLAGS) -L$(LIB_DIR) -Wl,-rpath='$$ORIGIN/../../$(LIB_DIR)' -Wl,--enable-new-dtags
-LDLIBS    := -pthread -lm -ldl -lSDL2
+LDFLAGS   := $(ARCH_FLAGS) -static-libgcc -static-libstdc++ -L$(LIB_DIR) -Wl,--enable-new-dtags -Wl,-rpath='$$ORIGIN/../../$(LIB_DIR)'
+LDLIBS    := -lSDL2 -lSDL2_image -lm -ldl -pthread
 
 DEPFLAGS   = -MT $@ -MMD -MP -MF $(DEP_DIR)/$*.d
 
 BUILD ?= release
 ifeq ($(BUILD),debug)
-    CFLAGS   += -g -Og -D_DEBUG
-    CXXFLAGS += -g -Og -D_DEBUG
+    CFLAGS   += -Og -g -D_DEBUG
+    CXXFLAGS += -Og -g -D_DEBUG
 else
     CFLAGS   += -O2 -fstack-protector-strong -DNDEBUG
     CXXFLAGS += -O2 -fstack-protector-strong -DNDEBUG

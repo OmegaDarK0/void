@@ -98,6 +98,10 @@ void void_window_poll_events(VoidWindow *window) {
     }
 }
 
+VoidRender *void_window_get_render(const VoidWindow *window) {
+    return window->render;
+}
+
 uint8 void_render_clear(const VoidWindow *window, const uint8 r, const uint8 g, const uint8 b, const uint8 a) {
     if (SDL_SetRenderDrawColor(window->render, r, g, b, a) < 0) {
         return VOID_FAILURE;
@@ -110,6 +114,26 @@ uint8 void_render_clear(const VoidWindow *window, const uint8 r, const uint8 g, 
 
 void void_render_present(const VoidWindow *window) {
     SDL_RenderPresent(window->render);
+}
+
+uint8 void_render_point(const VoidWindow *window, const float x, const float y, const uint8 r, const uint8 g, const uint8 b, const uint8 a) {
+    if (SDL_SetRenderDrawColor(window->render, r, g, b, a) < 0) {
+        return VOID_FAILURE;
+    }
+    if (SDL_RenderDrawPointF(window->render, x, y) < 0) {
+        return VOID_FAILURE;
+    }
+    return VOID_SUCCESS;
+}
+
+uint8 void_render_line(const VoidWindow *window, const float x1, const float y1, const float x2, const float y2, const uint8 r, const uint8 g, const uint8 b, const uint8 a) {
+    if (SDL_SetRenderDrawColor(window->render, r, g, b, a) < 0) {
+        return VOID_FAILURE;
+    }
+    if (SDL_RenderDrawLineF(window->render, x1, y1, x2, y2) < 0) {
+        return VOID_FAILURE;
+    }
+    return VOID_SUCCESS;
 }
 
 uint8 void_render_rect(const VoidWindow *window, const float x, const float y, const float w, const float h, const uint8 r, const uint8 g, const uint8 b, const uint8 a, bool fill) {

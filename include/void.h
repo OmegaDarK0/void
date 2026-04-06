@@ -2,6 +2,7 @@
 #define VOID_H
 
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -26,8 +27,8 @@ typedef enum {
 
 typedef enum {
     VOID_INIT_SDL = 1 << 0,
-    VOID_INIT_IMAGE = 1 << 1,
-    VOID_INIT_MIXER = 1 << 2,
+    VOID_INIT_IMG = 1 << 1,
+    VOID_INIT_MIX = 1 << 2,
 } VoidFlags;
 
 typedef unsigned char       uint8;
@@ -72,6 +73,8 @@ void void_frame_free(void);
 // ============================================================================
 // Pointeur opaque : le Front-end n'a pas besoin de savoir ce qu'est une fenêtre SDL
 typedef struct VoidWindow VoidWindow;
+typedef SDL_Renderer VoidRender;
+typedef SDL_Texture VoidTexture;
 
 VoidWindow *void_window_create(const char *title, uint32 width, uint32 height);
 void void_window_destroy(const VoidWindow *window);
@@ -79,6 +82,7 @@ void void_window_close(VoidWindow *window);
 bool void_window_is_running(const VoidWindow *window);
 bool void_window_should_close(const VoidWindow *window);
 void void_window_poll_events(VoidWindow *window); // Récupère les messages de l'OS
+VoidRender *void_window_get_render(const VoidWindow *window);
 
 // Lecture de l'état du clavier sans callback/event listener
 uint8 void_input_is_key_pressed(uint32 keycode);
@@ -93,8 +97,14 @@ uint8 void_render_clear(const VoidWindow *window, uint8 r, uint8 g, uint8 b, uin
 // Envoie l'image finale à l'écran (Swap Buffers)
 void void_render_present(const VoidWindow *window);
 
+uint8 void_render_point(const VoidWindow *window, float x, float y, uint8 r, uint8 g, uint8 b, uint8 a);
+uint8 void_render_line(const VoidWindow *window, float x1, float y1, float x2, float y2, uint8 r, uint8 g, uint8 b, uint8 a);
 // Dessine un rectangle plein
 uint8 void_render_rect(const VoidWindow *window, float x, float y, float w, float h, uint8 r, uint8 g, uint8 b, uint8 a, bool fill);
+
+VoidTexture *void_texture_load(const VoidWindow *window, const char *filename);
+void void_texture_destroy(VoidTexture *texture);
+uint8 void_texture_draw(const VoidWindow *window, VoidTexture *texture, float x, float y, float w, float h);
 
 // ============================================================================
 // THREADING BAS NIVEAU (thread.c)
