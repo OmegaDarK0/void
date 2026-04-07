@@ -49,8 +49,8 @@ void void_memory_exit(void) {
 }
 
 void *void_arena_alloc(const uint64 size, const uint32 alignment) {
-    const uint64 address = (uint64)s_global_arena.base + s_global_arena.offset;
-    const uint64 aligned_address = (address + (alignment - 1)) & ~(uint64)(alignment - 1);
+    const uintptr_t address = (uintptr_t)s_global_arena.base + s_global_arena.offset;
+    const uintptr_t aligned_address = (address + (alignment - 1)) & ~(uintptr_t)(alignment - 1);
     const uint64 padding = aligned_address - address;
     if (s_global_arena.offset + padding + size > s_global_arena.capacity) return NULL;
     s_global_arena.offset_prev = s_global_arena.offset;
@@ -63,8 +63,8 @@ void void_arena_rollback(void) {
 }
 
 void *void_frame_alloc(const uint64 size, const uint32 alignment) {
-    const uint64 address = (uint64)s_frame_arena.base + s_frame_arena.offset;
-    const uint64 aligned_address = (address + (alignment - 1)) & ~((uint64)alignment - 1);
+    const uintptr_t address = (uintptr_t)s_frame_arena.base + s_frame_arena.offset;
+    const uintptr_t aligned_address = (address + (alignment - 1)) & ~((uintptr_t)alignment - 1);
     const uint64 padding = aligned_address - address;
     if (s_frame_arena.offset + padding + size > s_frame_arena.capacity) return NULL;
     s_frame_arena.offset_prev = s_frame_arena.offset;

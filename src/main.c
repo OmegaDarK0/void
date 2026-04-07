@@ -29,7 +29,7 @@ int memory_test(void) {
 static volatile uint32 s_shared_counter = 0;
 
 void thread_stress_task(void *data) {
-    const uint32 increments_to_do = (uint32)(uint64)data;
+    const uint32 increments_to_do = (uint32)(uintptr_t)data;
     for (uint32 i = 0; i < increments_to_do; i++) {
         void_atomic_increment(&s_shared_counter);
     }
@@ -44,7 +44,7 @@ void thread_test(void) {
     printf("[THREAD TEST] Lancement de %u threads...\n", cores);
     printf("[THREAD TEST] Objectif a atteindre : %u\n", target);
     for (uint32 i = 0; i < cores; i++) {
-        void_thread_create(thread_stress_task, (void*)(uint64)increments_per_thread);
+        void_thread_create(thread_stress_task, (void*)(uintptr_t)increments_per_thread);
     }
     while (s_shared_counter < target) {
         void_thread_sleep(10);
@@ -110,6 +110,8 @@ int game_test(void) {
     return 0;
 }
 
-int main(void) {
+int main(const int argc, char *argv[]) {
+    (void)argc;
+    (void)argv;
     return game_test();
 }
