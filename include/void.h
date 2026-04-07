@@ -104,21 +104,22 @@ uint8 void_render_rect(const VoidWindow *window, float x, float y, float w, floa
 
 VoidTexture *void_texture_load(const VoidWindow *window, const char *filename);
 void void_texture_destroy(VoidTexture *texture);
-uint8 void_texture_draw(const VoidWindow *window, VoidTexture *texture, float x, float y, float w, float h);
+uint8 void_texture_draw(const VoidWindow *window, VoidTexture *texture, int src_x, int src_y, int src_w, int src_h, float dst_x, float dst_y, float dst_w, float dst_h);
 
 // ============================================================================
 // THREADING BAS NIVEAU (thread.c)
 // ============================================================================
 // Fournit juste ce qu'il faut pour que job.cpp (C++) construise ses Fibers
 typedef void (*VoidThreadFunc)(void *data);
+typedef struct VoidThread VoidThread;
 
 void void_thread_create(VoidThreadFunc func, void *data);
-void void_thread_sleep(uint32 milliseconds);
+void void_thread_sleep(uint32 ms);
 
 // Primitives atomiques pour éviter les mutex bloquants
 uint32 void_atomic_increment(volatile uint32 *value);
 uint32 void_atomic_decrement(volatile uint32 *value);
-uint8 void_atomic_compare_exchange(volatile uint32 *value, uint32 expected, uint32 new_value);
+uint8 void_atomic_compare_exchange(volatile uint32 *value, uint32 expected, uint32 desired);
 
 #ifdef __cplusplus
 }

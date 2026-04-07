@@ -30,3 +30,7 @@ void void_engine_quit(void) {
         SDL_Quit();
     }
 }
+
+uint32 void_system_get_core_count(void) {
+    return SDL_GetCPUCount();
+}
