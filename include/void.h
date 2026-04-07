@@ -5,8 +5,10 @@
 #include <SDL2/SDL_image.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdarg.h>
 #include <stdbool.h>
 #include <stdalign.h>
+#include <string.h>
 
 #define KB 1024
 #define MB (1024 * KB)
@@ -31,6 +33,18 @@ typedef enum {
     VOID_INIT_MIX = 1 << 2,
 } VoidFlags;
 
+typedef enum {
+    VOID_LOG_OK,
+    VOID_LOG_INFO,
+    VOID_LOG_WARN,
+    VOID_LOG_ERROR,
+    VOID_LOG_FATAL
+} VoidLogLevel;
+
+typedef void (*VoidThreadFunc)(void *data);
+typedef struct VoidThread VoidThread;
+typedef struct VoidLogEntry VoidLogEntry;
+
 typedef unsigned char       uint8;
 typedef unsigned short int  uint16;
 typedef unsigned int        uint32;
@@ -40,8 +54,8 @@ typedef unsigned long int   uint64;
 // SYSTÈME & TEMPS (core.c / time.c)
 // ============================================================================
 
-uint8 void_engine_init(void);
-void void_engine_quit(void);
+uint8 void_init(void);
+void void_exit(void);
 
 uint32 void_system_get_core_count(void); // Utile pour initialiser les workers (job.cpp)
 
@@ -56,8 +70,8 @@ float void_time_get_delta(void);        // Delta time calculé par le Back-end
 
 void void_memory_print(void);
 
-uint8 void_memory_init_arena(uint64 size);
-void void_memory_quit(void);
+uint8 void_memory_init(uint64 size);
+void void_memory_exit(void);
 
 // Allocation depuis l'arène globale (persistante)
 void *void_arena_alloc(uint64 size, uint32 alignment);
@@ -110,16 +124,26 @@ uint8 void_texture_draw(const VoidWindow *window, VoidTexture *texture, int src_
 // THREADING BAS NIVEAU (thread.c)
 // ============================================================================
 // Fournit juste ce qu'il faut pour que job.cpp (C++) construise ses Fibers
-typedef void (*VoidThreadFunc)(void *data);
-typedef struct VoidThread VoidThread;
 
 void void_thread_create(VoidThreadFunc func, void *data);
 void void_thread_sleep(uint32 ms);
+uint32 void_thread_get_id(void);
 
 // Primitives atomiques pour éviter les mutex bloquants
 uint32 void_atomic_increment(volatile uint32 *value);
 uint32 void_atomic_decrement(volatile uint32 *value);
 uint8 void_atomic_compare_exchange(volatile uint32 *value, uint32 expected, uint32 desired);
+
+void void_log_init(void);
+void void_log_push(VoidLogLevel level, const char *file, int line, const char *fmt, ...);
+void void_log_flush(void);
+void void_log_exit(void);
+
+#define VOID_LOG_INFO(...)  void_log_push(VOID_LOG_INFO, __FILE__, __LINE__, __VA_ARGS__)
+#define VOID_LOG_OK(...)    void_log_push(VOID_LOG_OK, __FILE__, __LINE__, __VA_ARGS__)
+#define VOID_LOG_WARN(...)  void_log_push(VOID_LOG_WARN, __FILE__, __LINE__, __VA_ARGS__)
+#define VOID_LOG_ERROR(...) void_log_push(VOID_LOG_ERROR, __FILE__, __LINE__, __VA_ARGS__)
+#define VOID_LOG_FATAL(...) void_log_push(VOID_LOG_FATAL, __FILE__, __LINE__, __VA_ARGS__)
 
 #ifdef __cplusplus
 }

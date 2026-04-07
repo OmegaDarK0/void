@@ -5,22 +5,28 @@
 
 uint8 s_init_state = 0;
 
-uint8 void_engine_init(void) {
+uint8 void_init(void) {
+    void_log_init();
     if (s_init_state) {
+        VOID_LOG_WARN("VOID already initialised! (state: %d)", s_init_state);
         return VOID_FAILURE;
     }
+    void_memory_init(KB);
     if (SDL_Init(SDL_INIT_FLAGS) < 0) {
+        VOID_LOG_ERROR("SDL_Init failed: %s", SDL_GetError());
         return VOID_FAILURE;
     }
     s_init_state |= VOID_INIT_SDL;
     if ((IMG_Init(IMG_INIT_FLAGS) & IMG_INIT_FLAGS) != IMG_INIT_FLAGS) {
+        VOID_LOG_ERROR("IMG_Init failed: %s", IMG_GetError());
         return VOID_FAILURE;
     }
     s_init_state |= VOID_INIT_IMG;
+    VOID_LOG_OK("VOID initialised! (state: %d)", s_init_state);
     return VOID_SUCCESS;
 }
 
-void void_engine_quit(void) {
+void void_exit(void) {
     if (s_init_state & VOID_INIT_IMG) {
         s_init_state &= ~VOID_INIT_IMG;
         IMG_Quit();
@@ -29,6 +35,9 @@ void void_engine_quit(void) {
         s_init_state &= ~VOID_INIT_SDL;
         SDL_Quit();
     }
+    VOID_LOG_INFO("VOID exited.");
+    void_memory_exit();
+    void_log_exit();
 }
 
 uint32 void_system_get_core_count(void) {

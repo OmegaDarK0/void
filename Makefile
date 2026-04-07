@@ -51,10 +51,17 @@ DEPS      := $(SRCS_C:$(SRC_DIR)/%.c=$(DEP_DIR)/%.d) \
 
 TARGET_BIN := $(BIN_DIR)/$(EXEC)
 
-BLUE   := \033[0;34m
-GREEN  := \033[0;32m
-YELLOW := \033[0;33m
-NC     := \033[0m
+ifeq ($(OS),Windows_NT)
+    BLUE   :=
+    GREEN  :=
+    YELLOW :=
+    NC     :=
+else
+    BLUE   := \033[0;34m
+    GREEN  := \033[0;32m
+    YELLOW := \033[0;33m
+    NC     := \033[0m
+endif
 
 .PHONY: all clean fclean re run debug
 

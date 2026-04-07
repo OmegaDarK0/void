@@ -26,21 +26,26 @@ void void_memory_print(void) {
     printf("--------------------------------------------------\n");
 }
 
-uint8 void_memory_init_arena(const uint64 size) {
+uint8 void_memory_init(const uint64 size) {
     s_global_arena.base = (uint8*)malloc(size);
-    if (s_global_arena.base == NULL) return VOID_FAILURE;
+    if (s_global_arena.base == NULL) {
+        VOID_LOG_FATAL("Memory is NULL!");
+        return VOID_FAILURE;
+    }
     s_frame_arena.capacity = (uint64)((double)size * FRAME_MEMORY_FACTOR);
     s_global_arena.capacity = size - s_frame_arena.capacity;
     s_frame_arena.base = s_global_arena.base + s_global_arena.capacity;
     s_global_arena.offset = 0;
     s_frame_arena.offset = 0;
+    VOID_LOG_OK("Memory allocated!");
     return VOID_SUCCESS;
 }
 
-void void_memory_quit(void) {
+void void_memory_exit(void) {
     free(s_global_arena.base);
     s_global_arena.base = NULL;
     s_frame_arena.base = NULL;
+    VOID_LOG_INFO("Memory free.");
 }
 
 void *void_arena_alloc(const uint64 size, const uint32 alignment) {

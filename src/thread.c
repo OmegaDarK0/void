@@ -5,7 +5,7 @@
 struct VoidThread {
     VoidThreadFunc func;
     void *data;
-} ;
+};
 
 static VoidThread s_threads[MAX_WORKER_THREADS];
 static volatile uint32 s_thread_count = 0;
@@ -31,6 +31,10 @@ void void_thread_create(const VoidThreadFunc func, void *data) {
 
 void void_thread_sleep(const uint32 ms) {
     SDL_Delay(ms);
+}
+
+uint32 void_thread_get_id(void) {
+    return SDL_GetThreadID(NULL);
 }
 
 uint32 void_atomic_increment(volatile uint32 *value) {

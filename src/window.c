@@ -8,7 +8,10 @@ struct VoidWindow {
 
 VoidWindow *void_window_create(const char *title, const uint32 width, const uint32 height) {
     VoidWindow* window = void_arena_alloc(sizeof(VoidWindow), alignof(VoidWindow));
-    if (window == NULL) return NULL;
+    if (window == NULL) {
+        VOID_LOG_ERROR("Window allocation failed!");
+        return NULL;
+    }
     window->handle = SDL_CreateWindow(title,
         SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
         (int)width, (int)height,
@@ -16,6 +19,7 @@ VoidWindow *void_window_create(const char *title, const uint32 width, const uint
         );
     if (window->handle == NULL) {
         void_arena_rollback();
+        VOID_LOG_ERROR("SDL_CreateWindow failed: %s", SDL_GetError());
         return NULL;
     }
     window->render = SDL_CreateRenderer(window->handle, -1,
@@ -24,18 +28,24 @@ VoidWindow *void_window_create(const char *title, const uint32 width, const uint
     if (window->render == NULL) {
         SDL_DestroyWindow(window->handle);
         void_arena_rollback();
+        VOID_LOG_ERROR("SDL_CreateRenderer failed: %s", SDL_GetError());
         return NULL;
     }
     window->is_running = true;
     window->should_close = false;
+    VOID_LOG_OK("Window created! (addr: %p)", window);
     return window;
 }
 
 void void_window_destroy(const VoidWindow *window) {
-    if (window == NULL) return;
+    if (window == NULL) {
+        VOID_LOG_WARN("Window already destroyed!");
+        return;
+    }
     if (window->render) SDL_DestroyRenderer(window->render);
     if (window->handle) SDL_DestroyWindow(window->handle);
     window = NULL;
+    VOID_LOG_INFO("Window destroyed.");
 }
 
 void void_window_close(VoidWindow *window) {
@@ -104,9 +114,11 @@ VoidRender *void_window_get_render(const VoidWindow *window) {
 
 uint8 void_render_clear(const VoidWindow *window, const uint8 r, const uint8 g, const uint8 b, const uint8 a) {
     if (SDL_SetRenderDrawColor(window->render, r, g, b, a) < 0) {
+        VOID_LOG_ERROR("SDL_SetRenderDrawColor failed: %s", SDL_GetError());
         return VOID_FAILURE;
     }
     if (SDL_RenderClear(window->render) < 0) {
+        VOID_LOG_ERROR("SDL_RenderClear failed: %s", SDL_GetError());
         return VOID_FAILURE;
     }
     return VOID_SUCCESS;
@@ -118,9 +130,11 @@ void void_render_present(const VoidWindow *window) {
 
 uint8 void_render_point(const VoidWindow *window, const float x, const float y, const uint8 r, const uint8 g, const uint8 b, const uint8 a) {
     if (SDL_SetRenderDrawColor(window->render, r, g, b, a) < 0) {
+        VOID_LOG_ERROR("SDL_SetRenderDrawColor failed: %s", SDL_GetError());
         return VOID_FAILURE;
     }
     if (SDL_RenderDrawPointF(window->render, x, y) < 0) {
+        VOID_LOG_ERROR("SDL_RenderDrawPointF failed: %s", SDL_GetError());
         return VOID_FAILURE;
     }
     return VOID_SUCCESS;
@@ -128,9 +142,11 @@ uint8 void_render_point(const VoidWindow *window, const float x, const float y, 
 
 uint8 void_render_line(const VoidWindow *window, const float x1, const float y1, const float x2, const float y2, const uint8 r, const uint8 g, const uint8 b, const uint8 a) {
     if (SDL_SetRenderDrawColor(window->render, r, g, b, a) < 0) {
+        VOID_LOG_ERROR("SDL_SetRenderDrawColor failed: %s", SDL_GetError());
         return VOID_FAILURE;
     }
     if (SDL_RenderDrawLineF(window->render, x1, y1, x2, y2) < 0) {
+        VOID_LOG_ERROR("SDL_RenderDrawLineF failed: %s", SDL_GetError());
         return VOID_FAILURE;
     }
     return VOID_SUCCESS;
@@ -138,15 +154,18 @@ uint8 void_render_line(const VoidWindow *window, const float x1, const float y1,
 
 uint8 void_render_rect(const VoidWindow *window, const float x, const float y, const float w, const float h, const uint8 r, const uint8 g, const uint8 b, const uint8 a, bool fill) {
     if (SDL_SetRenderDrawColor(window->render, r, g, b, a) < 0) {
+        VOID_LOG_ERROR("SDL_SetRenderDrawColor failed: %s", SDL_GetError());
         return VOID_FAILURE;
     }
     const SDL_FRect rect = {x, y, w, h};
     if (fill) {
         if (SDL_RenderFillRectF(window->render, &rect) < 0) {
+            VOID_LOG_ERROR("SDL_RenderFillRectF failed: %s", SDL_GetError());
             return VOID_FAILURE;
         }
     } else {
         if (SDL_RenderDrawRectF(window->render, &rect) < 0) {
+            VOID_LOG_ERROR("SDL_RenderDrawRectF failed: %s", SDL_GetError());
             return VOID_FAILURE;
         }
     }
