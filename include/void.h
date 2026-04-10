@@ -1,8 +1,6 @@
 #ifndef VOID_H
 #define VOID_H
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
@@ -23,10 +21,6 @@ extern "C" {
 // TYPES FONDAMENTAUX
 // ============================================================================
 // Garantie de la taille des données, vital pour le Data-Oriented Design (SoA)
-typedef enum {
-    VOID_SUCCESS,
-    VOID_FAILURE,
-} VoidStatus;
 
 typedef enum {
     VOID_INIT_SDL = 1 << 0,
@@ -55,7 +49,7 @@ typedef unsigned long int   uint64;
 // SYSTÈME & TEMPS (core.c / time.c)
 // ============================================================================
 
-uint8 void_init(void);
+bool void_init(void);
 void void_exit(void);
 
 uint32 void_system_get_core_count(void); // Utile pour initialiser les workers (job.cpp)
@@ -71,7 +65,7 @@ float void_time_get_delta(void);        // Delta time calculé par le Back-end
 
 void void_memory_print(void);
 
-uint8 void_memory_init(uint64 size);
+bool void_memory_init(uint64 size);
 void void_memory_exit(void);
 
 // Allocation depuis l'arène globale (persistante)
@@ -88,8 +82,8 @@ void void_frame_free(void);
 // ============================================================================
 // Pointeur opaque : le Front-end n'a pas besoin de savoir ce qu'est une fenêtre SDL
 typedef struct VoidWindow VoidWindow;
-typedef SDL_Renderer VoidRender;
-typedef SDL_Texture VoidTexture;
+typedef struct VoidRender VoidRender;
+typedef struct VoidTexture VoidTexture;
 
 VoidWindow *void_window_create(const char *title, uint32 width, uint32 height);
 void void_window_destroy(const VoidWindow *window);
@@ -107,19 +101,19 @@ uint8 void_input_is_mouse_button_pressed(uint8 button);
 // RENDU 2D BASIQUE (Fourni par le back-end SDL_Renderer)
 // ============================================================================
 // Efface l'écran avec une couleur (R, G, B, A)
-uint8 void_render_clear(const VoidWindow *window, uint8 r, uint8 g, uint8 b, uint8 a);
+bool void_render_clear(const VoidWindow *window, uint8 r, uint8 g, uint8 b, uint8 a);
 
 // Envoie l'image finale à l'écran (Swap Buffers)
 void void_render_present(const VoidWindow *window);
 
-uint8 void_render_point(const VoidWindow *window, float x, float y, uint8 r, uint8 g, uint8 b, uint8 a);
-uint8 void_render_line(const VoidWindow *window, float x1, float y1, float x2, float y2, uint8 r, uint8 g, uint8 b, uint8 a);
+bool void_render_point(const VoidWindow *window, float x, float y, uint8 r, uint8 g, uint8 b, uint8 a);
+bool void_render_line(const VoidWindow *window, float x1, float y1, float x2, float y2, uint8 r, uint8 g, uint8 b, uint8 a);
 // Dessine un rectangle plein
-uint8 void_render_rect(const VoidWindow *window, float x, float y, float w, float h, uint8 r, uint8 g, uint8 b, uint8 a, bool fill);
+bool void_render_rect(const VoidWindow *window, float x, float y, float w, float h, uint8 r, uint8 g, uint8 b, uint8 a, bool fill);
 
 VoidTexture *void_texture_load(const VoidWindow *window, const char *filename);
-void void_texture_destroy(VoidTexture *texture);
-uint8 void_texture_draw(const VoidWindow *window, VoidTexture *texture, int src_x, int src_y, int src_w, int src_h, float dst_x, float dst_y, float dst_w, float dst_h);
+void void_texture_destroy(const VoidTexture *texture);
+bool void_texture_draw(const VoidWindow *window, const VoidTexture *texture, int src_x, int src_y, int src_w, int src_h, float dst_x, float dst_y, float dst_w, float dst_h);
 
 // ============================================================================
 // THREADING BAS NIVEAU (thread.c)
@@ -133,7 +127,7 @@ uint32 void_thread_get_id(void);
 // Primitives atomiques pour éviter les mutex bloquants
 uint32 void_atomic_increment(volatile uint32 *value);
 uint32 void_atomic_decrement(volatile uint32 *value);
-uint8 void_atomic_compare_exchange(volatile uint32 *value, uint32 expected, uint32 desired);
+bool void_atomic_compare_exchange(volatile uint32 *value, uint32 expected, uint32 desired);
 
 void void_log_init(void);
 void void_log_push(VoidLogLevel level, const char *file, int line, const char *fmt, ...);

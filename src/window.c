@@ -1,9 +1,14 @@
+#include <SDL2/SDL.h>
 #include "void.h"
 
 struct VoidWindow {
     SDL_Window* handle;
     SDL_Renderer* render;
     bool is_running, should_close;
+};
+
+struct VoidRender {
+    SDL_Renderer* handle;
 };
 
 VoidWindow *void_window_create(const char *title, const uint32 width, const uint32 height) {
@@ -44,7 +49,6 @@ void void_window_destroy(const VoidWindow *window) {
     }
     if (window->render) SDL_DestroyRenderer(window->render);
     if (window->handle) SDL_DestroyWindow(window->handle);
-    window = NULL;
     VOID_LOG_INFO("Window destroyed.");
 }
 
@@ -109,65 +113,65 @@ void void_window_poll_events(VoidWindow *window) {
 }
 
 VoidRender *void_window_get_render(const VoidWindow *window) {
-    return window->render;
+    return (VoidRender*) window->render;
 }
 
-uint8 void_render_clear(const VoidWindow *window, const uint8 r, const uint8 g, const uint8 b, const uint8 a) {
+bool void_render_clear(const VoidWindow *window, const uint8 r, const uint8 g, const uint8 b, const uint8 a) {
     if (SDL_SetRenderDrawColor(window->render, r, g, b, a) < 0) {
         VOID_LOG_ERROR("SDL_SetRenderDrawColor failed: %s", SDL_GetError());
-        return VOID_FAILURE;
+        return false;
     }
     if (SDL_RenderClear(window->render) < 0) {
         VOID_LOG_ERROR("SDL_RenderClear failed: %s", SDL_GetError());
-        return VOID_FAILURE;
+        return false;
     }
-    return VOID_SUCCESS;
+    return true;
 }
 
 void void_render_present(const VoidWindow *window) {
     SDL_RenderPresent(window->render);
 }
 
-uint8 void_render_point(const VoidWindow *window, const float x, const float y, const uint8 r, const uint8 g, const uint8 b, const uint8 a) {
+bool void_render_point(const VoidWindow *window, const float x, const float y, const uint8 r, const uint8 g, const uint8 b, const uint8 a) {
     if (SDL_SetRenderDrawColor(window->render, r, g, b, a) < 0) {
         VOID_LOG_ERROR("SDL_SetRenderDrawColor failed: %s", SDL_GetError());
-        return VOID_FAILURE;
+        return false;
     }
     if (SDL_RenderDrawPointF(window->render, x, y) < 0) {
         VOID_LOG_ERROR("SDL_RenderDrawPointF failed: %s", SDL_GetError());
-        return VOID_FAILURE;
+        return false;
     }
-    return VOID_SUCCESS;
+    return true;
 }
 
-uint8 void_render_line(const VoidWindow *window, const float x1, const float y1, const float x2, const float y2, const uint8 r, const uint8 g, const uint8 b, const uint8 a) {
+bool void_render_line(const VoidWindow *window, const float x1, const float y1, const float x2, const float y2, const uint8 r, const uint8 g, const uint8 b, const uint8 a) {
     if (SDL_SetRenderDrawColor(window->render, r, g, b, a) < 0) {
         VOID_LOG_ERROR("SDL_SetRenderDrawColor failed: %s", SDL_GetError());
-        return VOID_FAILURE;
+        return false;
     }
     if (SDL_RenderDrawLineF(window->render, x1, y1, x2, y2) < 0) {
         VOID_LOG_ERROR("SDL_RenderDrawLineF failed: %s", SDL_GetError());
-        return VOID_FAILURE;
+        return false;
     }
-    return VOID_SUCCESS;
+    return true;
 }
 
-uint8 void_render_rect(const VoidWindow *window, const float x, const float y, const float w, const float h, const uint8 r, const uint8 g, const uint8 b, const uint8 a, bool fill) {
+bool void_render_rect(const VoidWindow *window, const float x, const float y, const float w, const float h, const uint8 r, const uint8 g, const uint8 b, const uint8 a, bool fill) {
     if (SDL_SetRenderDrawColor(window->render, r, g, b, a) < 0) {
         VOID_LOG_ERROR("SDL_SetRenderDrawColor failed: %s", SDL_GetError());
-        return VOID_FAILURE;
+        return false;
     }
     const SDL_FRect rect = {x, y, w, h};
     if (fill) {
         if (SDL_RenderFillRectF(window->render, &rect) < 0) {
             VOID_LOG_ERROR("SDL_RenderFillRectF failed: %s", SDL_GetError());
-            return VOID_FAILURE;
+            return false;
         }
     } else {
         if (SDL_RenderDrawRectF(window->render, &rect) < 0) {
             VOID_LOG_ERROR("SDL_RenderDrawRectF failed: %s", SDL_GetError());
-            return VOID_FAILURE;
+            return false;
         }
     }
-    return VOID_SUCCESS;
+    return true;
 }

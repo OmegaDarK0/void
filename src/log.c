@@ -77,26 +77,26 @@ void void_log_flush(void) {
         const uint32 ring_index = s_log_tail % MAX_LOG_ENTRIES;
         VoidLogEntry *entry = &s_log_buffer[ring_index];
         if (!entry->is_ready) break;
-        char *tag = "[INFO]", *color = NC, *reset = NC;
+        char *tag = " VOID ", *color = NC, *reset = NC;
         switch (entry->level) {
             case VOID_LOG_INFO:
-                tag = "[INFO]";
+                tag = " INFO ";
                 color = CYAN;
                 break;
             case VOID_LOG_OK:
-                tag = "[ OK ]";
+                tag = "  OK  ";
                 color = GREEN;
                 break;
             case VOID_LOG_WARN:
-                tag = "[WARN]";
+                tag = " WARN ";
                 color = YELLOW;
                 break;
             case VOID_LOG_ERROR:
-                tag = "[ERR!]";
+                tag = "ERROR!";
                 color = RED;
                 break;
             case VOID_LOG_FATAL:
-                tag = "[CRIT]";
+                tag = "FATAL!";
                 color = SCARLET;
                 break;
             default:
@@ -106,9 +106,9 @@ void void_log_flush(void) {
             color = "";
             reset = "";
         }
-        printf("%s%s [%06lu] [T:%010u] %s%s\n", color, tag, entry->timestamp, entry->thread_id, entry->text, reset);
+        printf("%s[%s] [%06lu] [T:%010u] %s%s\n", color, tag, entry->timestamp, entry->thread_id, entry->text, reset);
         if (s_log_file) {
-            fprintf(s_log_file, "%s [%06lu] [T:%010u] %s\n", tag, entry->timestamp, entry->thread_id, entry->text);
+            fprintf(s_log_file, "[%s] [%06lu] [T:%010u] %s\n", tag, entry->timestamp, entry->thread_id, entry->text);
             fflush(s_log_file);
         }
         s_log_tail++;

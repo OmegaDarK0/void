@@ -1,3 +1,5 @@
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
 #include "void.h"
 
 #define SDL_INIT_FLAGS (SDL_INIT_TIMER | SDL_INIT_AUDIO | SDL_INIT_VIDEO)
@@ -5,25 +7,25 @@
 
 uint8 s_init_state = 0;
 
-uint8 void_init(void) {
+bool void_init(void) {
     void_log_init();
     if (s_init_state) {
         VOID_LOG_WARN("VOID already initialised! (state: %d)", s_init_state);
-        return VOID_FAILURE;
+        return false;
     }
     void_memory_init(KB);
     if (SDL_Init(SDL_INIT_FLAGS) < 0) {
         VOID_LOG_ERROR("SDL_Init failed: %s", SDL_GetError());
-        return VOID_FAILURE;
+        return false;
     }
     s_init_state |= VOID_INIT_SDL;
     if ((IMG_Init(IMG_INIT_FLAGS) & IMG_INIT_FLAGS) != IMG_INIT_FLAGS) {
         VOID_LOG_ERROR("IMG_Init failed: %s", IMG_GetError());
-        return VOID_FAILURE;
+        return false;
     }
     s_init_state |= VOID_INIT_IMG;
     VOID_LOG_OK("VOID initialised! (state: %d)", s_init_state);
-    return VOID_SUCCESS;
+    return true;
 }
 
 void void_exit(void) {

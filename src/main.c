@@ -1,9 +1,10 @@
+#include <SDL2/SDL.h>
 #include "void.h"
 
 #define WINDOW_WIDTH 1280
 #define WINDOW_HEIGHT 720
 
-#define ANIMATION_SPEED 60
+#define ANIMATION_SPEED 50
 #define TOTAL_FRAMES 4
 #define FRAME_WIDTH 32
 #define FRAME_HEIGHT 32

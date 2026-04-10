@@ -1,3 +1,4 @@
+#include <SDL2/SDL.h>
 #include "void.h"
 
 #define MAX_DELTA_TIME 0.05f

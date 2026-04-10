@@ -26,11 +26,11 @@ void void_memory_print(void) {
     printf("--------------------------------------------------\n");
 }
 
-uint8 void_memory_init(const uint64 size) {
+bool void_memory_init(const uint64 size) {
     s_global_arena.base = (uint8*)malloc(size);
     if (s_global_arena.base == NULL) {
         VOID_LOG_FATAL("Memory is NULL!");
-        return VOID_FAILURE;
+        return false;
     }
     s_frame_arena.capacity = (uint64)((double)size * FRAME_MEMORY_FACTOR);
     s_global_arena.capacity = size - s_frame_arena.capacity;
@@ -38,7 +38,7 @@ uint8 void_memory_init(const uint64 size) {
     s_global_arena.offset = 0;
     s_frame_arena.offset = 0;
     VOID_LOG_OK("Memory allocated!");
-    return VOID_SUCCESS;
+    return true;
 }
 
 void void_memory_exit(void) {

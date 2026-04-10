@@ -1,3 +1,4 @@
+#include <SDL2/SDL.h>
 #include "void.h"
 
 #define MAX_WORKER_THREADS 64
@@ -15,7 +16,7 @@ static int void_thread_runner(void *ptr) {
     if (thread && thread->func) {
         thread->func(thread->data);
     }
-    return VOID_SUCCESS;
+    return true;
 }
 
 void void_thread_create(const VoidThreadFunc func, void *data) {
@@ -45,9 +46,9 @@ uint32 void_atomic_decrement(volatile uint32 *value) {
     return __sync_sub_and_fetch(value, 1);
 }
 
-uint8 void_atomic_compare_exchange(volatile uint32 *value, const uint32 expected, const uint32 desired) {
+bool void_atomic_compare_exchange(volatile uint32 *value, const uint32 expected, const uint32 desired) {
     if (__sync_bool_compare_and_swap(value, expected, desired)) {
-        return VOID_SUCCESS;
+        return true;
     }
-    return VOID_FAILURE;
+    return false;
 }
