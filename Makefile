@@ -109,23 +109,22 @@ TARGET_BIN := $(BIN_DIR)/$(BIN_NAME)
 TARGET_LIB := $(LIB_DIR)/$(LIB_NAME)
 
 COMMON_FLAGS := $(ARCH_FLAGS) -Wall -Wextra -I$(INC_DIR) -DVERSION=\"$(VERSION)\" $(OS_CFLAGS)
-
-CFLAGS    := $(COMMON_FLAGS) -std=c17
-CXXFLAGS  := $(COMMON_FLAGS) -std=c++20
-
-LDFLAGS   := $(ARCH_FLAGS) -static-libgcc -static-libstdc++ -L$(LIB_DIR) $(OS_LDFLAGS)
-DEPFLAGS   = -MT $@ -MMD -MP -MF $(DEP_DIR)/$*.d
+LDFLAGS      := $(ARCH_FLAGS) -static-libgcc -static-libstdc++ -L$(LIB_DIR) $(OS_LDFLAGS)
+DEPFLAGS      = -MT $@ -MMD -MP -MF $(DEP_DIR)/$*.d
 
 BUILD ?= release
 ifeq ($(BUILD),debug)
     COMMON_FLAGS += -Og -g -D_DEBUG
 else
     COMMON_FLAGS += -O2 -fstack-protector-strong -DNDEBUG
-    LDFLAGS  += -s
+    LDFLAGS      += -s
     ifeq ($(TARGET_OS),linux)
         LDFLAGS  += -Wl,-z,relro,-z,now
     endif
 endif
+
+CFLAGS       := $(COMMON_FLAGS) -std=c17
+CXXFLAGS     := $(COMMON_FLAGS) -std=c++20
 
 SRC_MAIN := $(wildcard $(SRC_DIR)/main.c) $(wildcard $(SRC_DIR)/main.cpp)
 
@@ -158,7 +157,7 @@ define POST_BUILD_STEP
 	fi
 endef
 
-.PHONY: all bin lib clean fclean re run debug
+.PHONY: all bin lib clean fclean re run debug info
 
 all: $(TARGET_BIN) $(TARGET_LIB)
 
@@ -190,7 +189,7 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp | $(OBJ_DIR) $(DEP_DIR)
 
 run: all
 	@echo "$(GREEN)[RUN] Launching...$(NC)"
-	@$(EXEC)
+	@$(EXEC) $(ARGS)
 
 debug:
 	@$(MAKE) --no-print-directory all BUILD=debug
@@ -207,3 +206,35 @@ fclean: clean
 re:
 	@$(MAKE) --no-print-directory fclean
 	@$(MAKE) --no-print-directory all
+
+info:
+	@echo "$(BLUE)==================================================$(NC)"
+	@echo "$(GREEN)          VOID ENGINE - BUILD CONFIGURATION       $(NC)"
+	@echo "$(BLUE)==================================================$(NC)"
+	@echo "$(YELLOW)[Project]$(NC)"
+	@echo "  Name     : $(NAME)"
+	@echo "  Version  : $(VERSION)"
+	@echo "  Build    : $(BUILD)"
+	@echo ""
+	@echo "$(YELLOW)[Environment]$(NC)"
+	@echo "  Host OS  : $(HOST_OS) ($(HOST_ARCH))"
+	@echo "  Target   : $(TARGET_OS) ($(TARGET_ARCH))"
+	@echo ""
+	@echo "$(YELLOW)[Toolchain]$(NC)"
+	@echo "  C Compiler   : $(CC)"
+	@echo "  C++ Compiler : $(CXX)"
+	@echo "  Archiver     : $(AR)"
+	@echo ""
+	@echo "$(YELLOW)[Directories]$(NC)"
+	@echo "  Sources  : $(SRC_DIR)/"
+	@echo "  Includes : $(INC_DIR)/"
+	@echo "  Objects  : $(OBJ_DIR)/"
+	@echo "  Library  : $(LIB_DIR)/"
+	@echo "  Binary   : $(BIN_DIR)/"
+	@echo ""
+	@echo "$(YELLOW)[Flags]$(NC)"
+	@echo "  CFLAGS   : $(CFLAGS)"
+	@echo "  CXXFLAGS : $(CXXFLAGS)"
+	@echo "  LDFLAGS  : $(LDFLAGS)"
+	@echo "  LDLIBS   : $(LDLIBS)"
+	@echo "$(BLUE)==================================================$(NC)"

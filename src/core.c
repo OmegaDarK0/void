@@ -13,7 +13,6 @@ bool void_init(void) {
         VOID_LOG_WARN("VOID already initialised! (state: %d)", s_init_state);
         return false;
     }
-    void_memory_init(KB);
     if (SDL_Init(SDL_INIT_FLAGS) < 0) {
         VOID_LOG_ERROR("SDL_Init failed: %s", SDL_GetError());
         return false;
