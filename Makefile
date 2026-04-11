@@ -82,8 +82,8 @@ ifeq ($(TARGET_OS),windows)
 else ifeq ($(TARGET_OS),linux)
     BIN_EXT  :=
     LDLIBS   := -lSDL2 -lSDL2_image -lm -ldl -pthread
-    OS_CFLAGS  :=
-    OS_LDFLAGS := -Wl,--enable-new-dtags -Wl,-rpath='$$ORIGIN'
+    OS_CFLAGS  := -fPIC
+    OS_LDFLAGS := -pie -Wl,--enable-new-dtags -Wl,-rpath='$$ORIGIN'
 endif
 
 ifeq ($(TARGET_ARCH),i386)
