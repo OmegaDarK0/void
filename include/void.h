@@ -26,7 +26,7 @@ typedef enum {
     VOID_INIT_SDL = 1 << 0,
     VOID_INIT_IMG = 1 << 1,
     VOID_INIT_MIX = 1 << 2,
-} VoidFlags;
+} VoidInitFlag;
 
 typedef enum {
     VOID_LOG_OK,
@@ -47,7 +47,7 @@ typedef enum {
     VOID_KEY_RIGHT,
     VOID_KEY_SPACE,
     VOID_KEY_ESCAPE
-} VoidKey;
+} VoidKeyCode;
 
 typedef void (*VoidThreadFunc)(void *data);
 
@@ -107,14 +107,23 @@ bool        void_window_is_running(const VoidWindow *window);
 bool        void_window_should_close(const VoidWindow *window);
 void        void_window_poll_events(VoidWindow *window); // Polls OS messages
 VoidRender *void_window_get_render(const VoidWindow *window);
+void        void_window_get_size(const VoidWindow *window, int *width, int *height);
 
 // Reads keyboard state instantly without callbacks/event listeners
-bool        void_input_is_key_pressed(VoidKey key);
+bool        void_input_is_key_pressed(VoidKeyCode key);
 //bool      void_input_is_mouse_button_pressed(uint8 button);
 
 // ============================================================================
 // BASIC 2D RENDERING (Provided by the SDL_Renderer back-end)
 // ============================================================================
+
+typedef struct {
+    float x, y;
+} VoidPoint;
+
+typedef struct {
+    float x, y, w, h;
+} VoidRect;
 
 // Clears the screen with a color (R, G, B, A)
 bool void_render_clear(const VoidWindow *window, uint8 r, uint8 g, uint8 b, uint8 a);
@@ -126,6 +135,10 @@ void void_render_present(const VoidWindow *window);
 bool void_render_point(const VoidWindow *window, float x, float y, uint8 r, uint8 g, uint8 b, uint8 a);
 bool void_render_line(const VoidWindow *window, float x1, float y1, float x2, float y2, uint8 r, uint8 g, uint8 b, uint8 a);
 bool void_render_rect(const VoidWindow *window, float x, float y, float w, float h, uint8 r, uint8 g, uint8 b, uint8 a, bool fill);
+
+bool void_render_points(const VoidWindow *window, const VoidPoint *points, int count, uint8 r, uint8 g, uint8 b, uint8 a);
+bool void_render_lines(const VoidWindow *window, const VoidPoint *points, int count, uint8 r, uint8 g, uint8 b, uint8 a);
+bool void_render_rects(const VoidWindow *window, const VoidRect *rects, int count, uint8 r, uint8 g, uint8 b, uint8 a, bool fill);
 
 // Texture management
 VoidTexture *void_texture_load(const VoidWindow *window, const char *filename);

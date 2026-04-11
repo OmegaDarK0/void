@@ -116,6 +116,15 @@ VoidRender *void_window_get_render(const VoidWindow *window) {
     return (VoidRender*) window->render;
 }
 
+void void_window_get_size(const VoidWindow *window, int *width, int *height) {
+    if (window == NULL || window->handle == NULL) {
+        if (width) *width = 0;
+        if (height) *height = 0;
+        return;
+    }
+    SDL_GetWindowSize(window->handle, width, height);
+}
+
 bool void_render_clear(const VoidWindow *window, const uint8 r, const uint8 g, const uint8 b, const uint8 a) {
     if (SDL_SetRenderDrawColor(window->render, r, g, b, a) < 0) {
         VOID_LOG_ERROR("SDL_SetRenderDrawColor failed: %s", SDL_GetError());
@@ -156,7 +165,7 @@ bool void_render_line(const VoidWindow *window, const float x1, const float y1, 
     return true;
 }
 
-bool void_render_rect(const VoidWindow *window, const float x, const float y, const float w, const float h, const uint8 r, const uint8 g, const uint8 b, const uint8 a, bool fill) {
+bool void_render_rect(const VoidWindow *window, const float x, const float y, const float w, const float h, const uint8 r, const uint8 g, const uint8 b, const uint8 a, const bool fill) {
     if (SDL_SetRenderDrawColor(window->render, r, g, b, a) < 0) {
         VOID_LOG_ERROR("SDL_SetRenderDrawColor failed: %s", SDL_GetError());
         return false;
@@ -170,6 +179,49 @@ bool void_render_rect(const VoidWindow *window, const float x, const float y, co
     } else {
         if (SDL_RenderDrawRectF(window->render, &rect) < 0) {
             VOID_LOG_ERROR("SDL_RenderDrawRectF failed: %s", SDL_GetError());
+            return false;
+        }
+    }
+    return true;
+}
+
+bool void_render_points(const VoidWindow *window, const VoidPoint *points, const int count, const uint8 r, const uint8 g, const uint8 b, const uint8 a) {
+    if (SDL_SetRenderDrawColor(window->render, r, g, b, a) < 0) {
+        VOID_LOG_ERROR("SDL_SetRenderDrawColor failed: %s", SDL_GetError());
+        return false;
+    }
+    if (SDL_RenderDrawPointsF(window->render, (const SDL_FPoint*)points, count) < 0) {
+        VOID_LOG_ERROR("SDL_RenderDrawPointsF failed: %s", SDL_GetError());
+        return false;
+    }
+    return true;
+}
+
+bool void_render_lines(const VoidWindow *window, const VoidPoint *points, const int count, const uint8 r, const uint8 g, const uint8 b, const uint8 a) {
+    if (SDL_SetRenderDrawColor(window->render, r, g, b, a) < 0) {
+        VOID_LOG_ERROR("SDL_SetRenderDrawColor failed: %s", SDL_GetError());
+        return false;
+    }
+    if (SDL_RenderDrawLinesF(window->render, (const SDL_FPoint*)points, count) < 0) {
+        VOID_LOG_ERROR("SDL_RenderDrawLinesF failed: %s", SDL_GetError());
+        return false;
+    }
+    return true;
+}
+
+bool void_render_rects(const VoidWindow *window, const VoidRect *rects, const int count, const uint8 r, const uint8 g, const uint8 b, const uint8 a, const bool fill) {
+    if (SDL_SetRenderDrawColor(window->render, r, g, b, a) < 0) {
+        VOID_LOG_ERROR("SDL_SetRenderDrawColor failed: %s", SDL_GetError());
+        return false;
+    }
+    if (fill) {
+        if (SDL_RenderFillRectsF(window->render, (const SDL_FRect*)rects, count) < 0) {
+            VOID_LOG_ERROR("SDL_RenderFillRectsF failed: %s", SDL_GetError());
+            return false;
+        }
+    } else {
+        if (SDL_RenderDrawRectsF(window->render, (const SDL_FRect*)rects, count) < 0) {
+            VOID_LOG_ERROR("SDL_RenderDrawRectsF failed: %s", SDL_GetError());
             return false;
         }
     }

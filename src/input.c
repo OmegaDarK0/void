@@ -1,7 +1,7 @@
 #include <SDL2/SDL.h>
 #include "void.h"
 
-bool void_input_is_key_pressed(const VoidKey key) {
+bool void_input_is_key_pressed(const VoidKeyCode key) {
     const uint8 *state = (uint8*)SDL_GetKeyboardState(NULL);
     switch (key) {
         case VOID_KEY_W: return state[SDL_SCANCODE_W];
