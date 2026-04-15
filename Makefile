@@ -22,16 +22,18 @@ else
         $(error "Unsupported OS: $(RAW_OS)")
     endif
 
-    ifeq ($(RAW_ARCH),amd64)
-        HOST_ARCH := x86_64
-    else ifeq ($(RAW_ARCH),x86_64)
-        HOST_ARCH := x86_64
-    else ifeq ($(RAW_ARCH),aarch64)
+    ifeq ($(RAW_ARCH),aarch64)
         $(error "arm64 is not yet implemented.")
     else ifeq ($(RAW_ARCH),arm64)
         $(error "arm64 is not yet implemented.")
+    else ifeq ($(RAW_ARCH),amd64)
+        HOST_ARCH := x86_64
+    else ifeq ($(RAW_ARCH),x86_64)
+        HOST_ARCH := x86_64
+    else ifeq ($(RAW_ARCH),x86)
+        HOST_ARCH := x86
     else ifneq (,$(filter i%86,$(RAW_ARCH)))
-        HOST_ARCH := i386
+        HOST_ARCH := x86
     else
         $(error "Unsupported Architecture: $(RAW_ARCH)")
     endif
@@ -86,7 +88,7 @@ else ifeq ($(TARGET_OS),linux)
     OS_LDFLAGS := -pie -Wl,--enable-new-dtags -Wl,-rpath='$$ORIGIN'
 endif
 
-ifeq ($(TARGET_ARCH),i386)
+ifeq ($(TARGET_ARCH),x86)
     ARCH_FLAGS := -m32
 else
     ARCH_FLAGS := -m64
@@ -157,11 +159,9 @@ define POST_BUILD_STEP
 	fi
 endef
 
-.PHONY: all bin lib clean fclean re run debug info
+.PHONY: all lib clean fclean distclean re run debug info
 
-all: $(TARGET_BIN) $(TARGET_LIB)
-
-bin: $(TARGET_BIN)
+all: $(TARGET_BIN)
 
 lib: $(TARGET_LIB)
 
@@ -200,8 +200,13 @@ clean:
 	@echo "$(RED)[CLEAN] Build directory removed.$(NC)"
 
 fclean: clean
-	@rm -rf $(BIN_DIR)
+	@rm -rf $(TARGET_BIN) $(TARGET_LIB)
 	@echo "$(RED)[FCLEAN] Binary removed.$(NC)"
+
+distclean:
+	@rm -rf build bin
+	@rm -f lib/*/$(LIB_NAME)
+	@echo "$(RED)[DISTCLEAN] All builds and binaries removed.$(NC)"
 
 re:
 	@$(MAKE) --no-print-directory fclean
